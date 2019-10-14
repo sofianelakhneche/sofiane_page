@@ -1,0 +1,18 @@
+kind: pipeline
+name: dev.midgar.sofiane
+
+steps:
+  - name: deploy
+    image: docker
+    commands:
+      - docker stop dev.midgar.sofiane || true && docker rm dev.midgar.sofiane || true
+      - docker build -t dev.midgar.sofiane .
+      - docker run -d --network="proxy" -l traefik.backend=dev.midgar.sofiane -l traefik.frontend.rule=Host:sofiane.midgar.dev -l traefik.docker.network=proxy -l traefik.port=80 --rm --name dev.midgar.sofiane dev.midgar.sofiane:latest
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+
+volumes:
+  - name: docker
+    host: 
+      path: /var/run/docker.sock
